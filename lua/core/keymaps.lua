@@ -17,5 +17,8 @@ local opts = { noremap = true }
 --   command_mode = "c",
 
 -- for US keyboard
-vim.keymap.set('n', ';', ':', opts)
-vim.keymap.set('n', ':', ';', opts)
+vim.keymap.set('n', '<leader>w', ':w<CR>', opts)
+vim.keymap.set('n', '<leader>q', ':q<CR>', opts)
+
+vim.keymap.set('n', '<ESC><ESC>', ':nohl<CR>', opts)
+
