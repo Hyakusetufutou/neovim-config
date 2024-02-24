@@ -1,7 +1,7 @@
 return {
   {
     "cshuaimin/ssr.nvim",
-    lazy = false,
+    lazy = true,
     module = "ssr",
     -- Calling setup is optional.
     cond = false,
