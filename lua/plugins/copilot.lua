@@ -1,6 +1,6 @@
 return {
   "github/copilot.vim",
-  lazy = false
+  lazy = false,
   event = "InsertEnter",
   cond = function()
     return not vim.g.vscode
