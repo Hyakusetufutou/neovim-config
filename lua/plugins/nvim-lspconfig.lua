@@ -4,11 +4,14 @@ return {
     { 'hrsh7th/cmp-nvim-lsp' },
     { "lukas-reineke/lsp-format.nvim" },
     { 'folke/neodev.nvim' },
+    { "williamboman/mason.nvim" },
+    { "williamboman/mason-lspconfig.nvim" },
   },
   cmd = { 'LspInfo', 'LspInstall', 'LspStart' },
   event = { 'BufReadPre', 'BufNewFile' },
   config = function()
     local lspconfig = require('lspconfig')
+    local mason_lspconfig = require('mason-lspconfig')
     -- The nvim-cmp almost supports LSP's capabilities so You should advertise it to LSP servers..
     local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
@@ -16,6 +19,43 @@ return {
       require("lsp-format").on_attach(client, bufnr)
       -- ... custom code ...
     end
+
+
+    require("mason").setup({
+      ui = {
+        icons = {
+          package_installed = "✓",
+          package_pending = "➜",
+          package_uninstalled = "✗"
+        }
+      }
+    })
+
+    mason_lspconfig.setup{
+      ensure_installed = {
+        "tsserver",
+      }
+    }
+
+    mason_lspconfig.setup_handlers {
+      function(server_name)
+        lspconfig[server_name].setup {}
+      end,
+
+      -- Typescript
+      lspconfig.tsserver.setup {
+        capabilities = capabilities,
+        on_attach = on_attach,
+        single_file_support = false,
+        root_dir = lspconfig.util.root_pattern("package.json"),
+      },
+
+      -- Go
+      lspconfig.gopls.setup {
+        capabilities = capabilities,
+        -- on_attach = on_attach,
+      },
+    }
 
     vim.api.nvim_create_autocmd("BufWritePre", {
       pattern = "*.go",
@@ -38,43 +78,6 @@ return {
         vim.lsp.buf.format({ async = false })
       end
     })
-
-    -- TypeScript
-    lspconfig.tsserver.setup {
-      capabilities = capabilities,
-      on_attach = on_attach,
-      single_file_support = false,
-      root_dir = lspconfig.util.root_pattern("package.json"),
-    }
-
-    -- Deno
-    lspconfig.denols.setup {
-      capabilities = capabilities,
-      on_attach = on_attach,
-      root_dir = lspconfig.util.root_pattern("deno.json"),
-      init_options = {
-        lint = true,
-        unstable = true,
-        suggest = {
-          imports = {
-            hosts = {
-              ["https://deno.land"] = true,
-              ["https://cdn.nest.land"] = true,
-              ["https://crux.land"] = true,
-            },
-          },
-        },
-      },
-    }
-
-
-    require('neodev').setup()
-
-    -- Go
-    lspconfig.gopls.setup {
-      capabilities = capabilities,
-      -- on_attach = on_attach,
-    }
 
     -- Use LspAttach autocommand to only map the following keys
     -- after the language server attaches to the current buffer
@@ -99,5 +102,6 @@ return {
         vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
       end,
     })
+
   end,
 }
