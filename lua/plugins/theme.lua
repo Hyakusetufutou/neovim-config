@@ -1,43 +1,42 @@
 return {
-  {
-    'catppuccin/nvim',
-    event = "VimEnter",
-    priority = 1000,
-    name = "catppuccin",
-    cond = function()
-      return not vim.g.vscode
-    end,
-    opts = {
-      term_colors = true,
-      transparent_background = true,
-      integrations = {
-        alpha = true,
-        cmp = true,
-        gitsigns = true,
-        lsp_trouble = true,
-        mason = true,
-        mini = true,
-        native_lsp = {
-          enabled = true,
-          underlines = {
-            errors = { "undercurl" },
-            hints = { "undercurl" },
-            warnings = { "undercurl" },
-            information = { "undercurl" },
-          },
-        },
-        telescope = true,
-        treesitter = true,
-        which_key = true,
-        nvimtree = true,
+  "Mofiqul/vscode.nvim",
+  lazy = false,
+  config = function()
+  -- Lua:
+    -- For dark theme (neovim's default)
+    vim.o.background = 'dark'
+    -- For light theme
+    --vim.o.background = 'light'
+
+    local c = require('vscode.colors').get_colors()
+    require('vscode').setup({
+      -- Alternatively set style in setup
+      -- style = 'light'
+
+      -- Enable transparent background
+      transparent = true,
+
+      -- Enable italic comment
+      italic_comments = false,
+
+      -- Underline `@markup.link.*` variants
+      underline_links = true,
+
+      -- Disable nvim-tree background color
+      disable_nvimtree_bg = true,
+
+      -- Override colors (see ./lua/vscode/colors.lua)
+      color_overrides = {
+          vscLineNumber = '#FFFFFF',
       },
-    },
-    config = function()
-      if vim.g.vscode then
-        vim.cmd.colorscheme ""
-      else
-        vim.cmd.colorscheme "catppuccin"
-      end
-    end,
-  },
+
+      -- Override highlight groups (see ./lua/vscode/theme.lua)
+      group_overrides = {
+          -- this supports the same val table as vim.api.nvim_set_hl
+          -- use colors from this colorscheme by requiring vscode.colors!
+          Cursor = { fg=c.vscDarkBlue, bg=c.vscLightGreen, bold=true },
+      }
+    })
+    require('vscode').load()
+  end,
 }
